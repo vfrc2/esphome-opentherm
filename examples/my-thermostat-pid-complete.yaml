@@ -1,0 +1,194 @@
+# A complete configuration with every sensor, binary sensor, switch and input
+# enabled. It uses a PID controller for the setpoints on the main and secondary
+# central heating circuits, and allows you to set other input values as a
+# number.
+esphome:
+  name: thermostat-pid-baxi
+
+external_components:
+  source: ../components
+
+esp8266:
+  board: d1_mini
+
+logger:
+
+api:
+ota:
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+opentherm:
+  in_pin: 4
+  out_pin: 5
+  master_id: 4
+  ch_enable: true
+  dhw_enable: true
+  cooling_enable: false
+  otc_active: false
+  ch2_active: false
+
+  t_room: ch_room_temperature
+
+output:
+  - platform: opentherm
+    t_set:
+      id: t_set
+      min_value: 15
+      max_value: 85
+
+number:
+  - platform: opentherm
+    cooling_control:
+      name: "Boiler Cooling control signal"
+    t_dhw_set:
+      name: "Boiler DHW Setpoint"
+    max_t_set:
+      name: "Boiler Max Setpoint"
+    t_room_set:
+      name: "Boiler Room Setpoint"
+
+sensor:
+  - platform: opentherm
+    rel_mod_level:
+      name: "Boiler Relative modulation level"
+    ch_pressure:
+      name: "Boiler Water pressure in CH circuit"
+    dhw_flow_rate:
+      name: "Boiler Water flow rate in DHW circuit"
+    t_boiler:
+      name: "Boiler water temperature"
+    t_dhw:
+      name: "Boiler DHW temperature"
+    t_outside:
+      name: "Boiler Outside temperature"
+    t_ret:
+      name: "Boiler Return water temperature"
+    t_storage:
+      name: "Boiler Solar storage temperature"
+    t_collector:
+      name: "Boiler Solar collector temperature"
+    t_exhaust:
+      name: "Boiler Exhaust temperature"
+    burner_starts:
+      name: "Boiler Number of starts burner"
+    ch_pump_starts:
+      name: "Boiler Number of starts CH pump"
+    dhw_pump_valve_starts:
+      name: "Boiler Number of starts DHW pump/valve"
+    dhw_burner_starts:
+      name: "Boiler Number of starts burner during DHW mode"
+    burner_operation_hours:
+      name: "Boiler Number of hours that burner is in operation (i.e. flame on)"
+    ch_pump_operation_hours:
+      name: "Boiler Number of hours that CH pump has been running"
+    dhw_pump_valve_operation_hours:
+      name: "Boiler Number of hours that DHW pump has been running or DHW valve has been opened"
+    dhw_burner_operation_hours:
+      name: "Boiler Number of hours that burner is in operation during DHW mode"
+    t_dhw_set_ub:
+      name: "Boiler Upper bound for adjustement of DHW setpoint"
+    t_dhw_set_lb:
+      name: "Boiler Lower bound for adjustement of DHW setpoint"
+    max_t_set_ub:
+      name: "Boiler Upper bound for adjustement of max CH setpoint"
+    max_t_set_lb:
+      name: "Boiler Lower bound for adjustement of max CH setpoint"
+    t_dhw_set:
+      name: "Boiler Domestic hot water temperature setpoint"
+    max_t_set:
+      name: "Boiler Maximum allowable CH water setpoint"
+  
+  - platform: adc
+    id: ch_pressure_ext
+    pin: A0
+    unit_of_measurement: "bar"
+    name: "Boiler Water pressure in CH circuit (ext) V"
+    device_class: "pressure"
+    filters:
+      - clamp:
+          min_value: 0
+      - calibrate_linear:
+          method: least_squares
+          datapoints:
+            - 0.33 -> -0
+            - 3.33 -> 12
+
+  - platform: homeassistant
+    id: ch_room_temperature
+    entity_id: sensor.sensor_livingroom_temperature
+    filters: 
+      # Push room temperature every second to update PID parameters
+      - heartbeat: 1s 
+
+binary_sensor:
+  - platform: opentherm
+    fault_indication:
+      name: "Boiler Fault indication"
+    ch_active:
+      name: "Boiler Central Heating active"
+    dhw_active:
+      name: "Boiler Domestic Hot Water active"
+    flame_on:
+      name: "Boiler Flame on"
+    cooling_active:
+      name: "Boiler Cooling active"
+    diagnostic_indication:
+      name: "Boiler Diagnostic event"
+    dhw_present:
+      name: "Boiler DHW present"
+    control_type_on_off:
+      name: "Boiler Control type is on/off"
+    cooling_supported:
+      name: "Boiler Cooling supported"
+    dhw_storage_tank:
+      name: "Boiler DHW storage tank"
+    master_pump_control_allowed:
+      name: "Boiler Master pump control allowed"
+    dhw_setpoint_transfer_enabled:
+      name: "Boiler DHW setpoint transfer enabled"
+    max_ch_setpoint_transfer_enabled:
+      name: "Boiler CH maximum setpoint transfer enabled"
+    dhw_setpoint_rw:
+      name: "Boiler DHW setpoint read/write"
+    max_ch_setpoint_rw:
+      name: "Boiler CH maximum setpoint read/write"
+
+switch:
+  - platform: opentherm
+    ch_enable:
+      name: "Boiler Central Heating enabled"
+      mode: restore_default_on
+    dhw_enable:
+      name: "Boiler Domestic Hot Water enabled"
+    cooling_enable:
+      name: "Boiler Cooling enabled"
+      mode: start_off
+    otc_active:
+      name: "Boiler Outside temperature compensation active"
+
+button:
+  - platform: template
+    name: "PID Climate Autotune"
+    on_press:
+      - climate.pid.autotune: central_heating
+
+climate:
+  - platform: pid
+    id: central_heating
+    name: "Central heating"
+    heat_output: t_set
+    default_target_temperature: 20
+    sensor: ch_room_temperature
+    deadband_parameters:
+      threshold_high: 0.5°C
+      threshold_low: -1.0°C
+      kp_multiplier: 0.0   # proportional gain turned off inside deadband
+      ki_multiplier: 0.05  # integral accumulates at only 5% of normal ki
+      kd_multiplier: 0.0   # derviative is turned off inside deadband
+      deadband_output_averaging_samples: 15  
+    control_parameters: 
+      kp: 0
+      ki: 0
+      kd: 0
