@@ -53,4 +53,4 @@ async def to_code(config: Dict[str, Any]) -> None:
         generate.add_messages(var, input_sensors, schema.INPUTS)
 
 # Use the freebear-nc forked version of OpenTherm library.
-#    cg.add_library("ihormelnyk/OpenTherm Library", "1.1.4")
+    cg.add_library("ihormelnyk/OpenTherm Library", "1.1.4")

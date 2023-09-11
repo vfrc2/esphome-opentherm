@@ -2,6 +2,31 @@
 # enabled. It uses a PID controller for the setpoints on the main and secondary
 # central heating circuits, and allows you to set other input values as a
 # number.
+
+# central_heating: PID Autotune finished!
+# [04:00:52][I][pid.autotune:140]: central_heating: PID Autotune:
+# [04:00:52][I][pid.autotune:141]:   State: Succeeded!
+# [04:00:52][W][pid.autotune:149]:   Oscillation Frequency is not symmetrical. PID parameters may be inaccurate!
+# [04:00:52][W][pid.autotune:150]:     This is usually because the heat and cool processes do not change the temperature at the same rate.
+# [04:00:52][W][pid.autotune:153]:     Please try reducing the positive_output value (or increase negative_output in case of a cooler)
+# [04:00:52][I][pid.autotune:162]:   Calculated PID parameters ("Ziegler-Nichols PID" rule):
+# [04:00:52][I][pid.autotune:163]:  
+# [04:00:52][I][pid.autotune:164]:   control_parameters:
+# [04:00:52][I][pid.autotune:165]:     kp: 0.60630
+# [04:00:52][I][pid.autotune:166]:     ki: 0.00009
+# [04:00:52][I][pid.autotune:167]:     kd: 1000.09912
+# [04:00:52][I][pid.autotune:168]:  
+# [04:00:52][I][pid.autotune:169]:   Please copy these values into your YAML configuration! They will reset on the next reboot.
+# [04:00:52][D][pid.autotune:175]:   Alternative Rules:
+# [04:00:52][D][pid.autotune:207]:     Rule 'Ziegler-Nichols PI':
+# [04:00:52][D][pid.autotune:208]:       kp: 0.45473, ki: 0.00004, kd: 0.00000
+# [04:00:52][D][pid.autotune:207]:     Rule 'Pessen Integral PID':
+# [04:00:52][D][pid.autotune:208]:       kp: 0.70736, ki: 0.00013, kd: 1400.13855
+# [04:00:52][D][pid.autotune:207]:     Rule 'Some Overshoot PID':
+# [04:00:52][D][pid.autotune:208]:       kp: 0.33650, ki: 0.00005, kd: 1480.14661
+# [04:00:52][D][pid.autotune:207]:     Rule 'No Overshoot PID':
+# [04:00:52][D][pid.autotune:208]:       kp: 0.20210, ki: 0.00003, kd: 833.41583
+# [04:00:52][I][pid.autotune:181]: central_heating: Autotune completed
 esphome:
   name: thermostat-pid-baxi
 
@@ -35,58 +60,58 @@ output:
   - platform: opentherm
     t_set:
       id: t_set
-      min_value: 15
+      min_value: 0
       max_value: 85
 
 number:
   - platform: opentherm
-    cooling_control:
-      name: "Boiler Cooling control signal"
+#     cooling_control:
+#       name: "Boiler Cooling control signal"
     t_dhw_set:
       name: "Boiler DHW Setpoint"
-    max_t_set:
-      name: "Boiler Max Setpoint"
-    t_room_set:
-      name: "Boiler Room Setpoint"
+#     max_t_set:
+#       name: "Boiler Max Setpoint"
+#     t_room_set:
+#       name: "Boiler Room Setpoint"
 
 sensor:
   - platform: opentherm
-    rel_mod_level:
-      name: "Boiler Relative modulation level"
-    ch_pressure:
-      name: "Boiler Water pressure in CH circuit"
-    dhw_flow_rate:
-      name: "Boiler Water flow rate in DHW circuit"
+    # rel_mod_level:
+    #   name: "Boiler Relative modulation level"
+    # ch_pressure:
+    #   name: "Boiler Water pressure in CH circuit"
+    # dhw_flow_rate:
+    #   name: "Boiler Water flow rate in DHW circuit"
     t_boiler:
       name: "Boiler water temperature"
     t_dhw:
       name: "Boiler DHW temperature"
-    t_outside:
-      name: "Boiler Outside temperature"
-    t_ret:
-      name: "Boiler Return water temperature"
-    t_storage:
-      name: "Boiler Solar storage temperature"
-    t_collector:
-      name: "Boiler Solar collector temperature"
-    t_exhaust:
-      name: "Boiler Exhaust temperature"
-    burner_starts:
-      name: "Boiler Number of starts burner"
-    ch_pump_starts:
-      name: "Boiler Number of starts CH pump"
-    dhw_pump_valve_starts:
-      name: "Boiler Number of starts DHW pump/valve"
-    dhw_burner_starts:
-      name: "Boiler Number of starts burner during DHW mode"
-    burner_operation_hours:
-      name: "Boiler Number of hours that burner is in operation (i.e. flame on)"
-    ch_pump_operation_hours:
-      name: "Boiler Number of hours that CH pump has been running"
-    dhw_pump_valve_operation_hours:
-      name: "Boiler Number of hours that DHW pump has been running or DHW valve has been opened"
-    dhw_burner_operation_hours:
-      name: "Boiler Number of hours that burner is in operation during DHW mode"
+    # t_outside:
+    #   name: "Boiler Outside temperature"
+    # t_ret:
+    #   name: "Boiler Return water temperature"
+    # t_storage:
+    #   name: "Boiler Solar storage temperature"
+    # t_collector:
+    #   name: "Boiler Solar collector temperature"
+    # t_exhaust:
+    #   name: "Boiler Exhaust temperature"
+    # burner_starts:
+    #   name: "Boiler Number of starts burner"
+    # ch_pump_starts:
+    #   name: "Boiler Number of starts CH pump"
+    # dhw_pump_valve_starts:
+    #   name: "Boiler Number of starts DHW pump/valve"
+    # dhw_burner_starts:
+    #   name: "Boiler Number of starts burner during DHW mode"
+    # burner_operation_hours:
+    #   name: "Boiler Number of hours that burner is in operation (i.e. flame on)"
+    # ch_pump_operation_hours:
+    #   name: "Boiler Number of hours that CH pump has been running"
+    # dhw_pump_valve_operation_hours:
+    #   name: "Boiler Number of hours that DHW pump has been running or DHW valve has been opened"
+    # dhw_burner_operation_hours:
+    #   name: "Boiler Number of hours that burner is in operation during DHW mode"
     t_dhw_set_ub:
       name: "Boiler Upper bound for adjustement of DHW setpoint"
     t_dhw_set_lb:
@@ -100,11 +125,18 @@ sensor:
     max_t_set:
       name: "Boiler Maximum allowable CH water setpoint"
   
+  - platform: template
+    name: "T set"
+    device_class: "temperature"
+    lambda: |-
+      return id(t_set).state;
+    update_interval: 60s
+  
   - platform: adc
     id: ch_pressure_ext
     pin: A0
     unit_of_measurement: "bar"
-    name: "Boiler Water pressure in CH circuit (ext) V"
+    name: "Boiler Water pressure in CH circuit (ext)"
     device_class: "pressure"
     filters:
       - clamp:
@@ -112,15 +144,37 @@ sensor:
       - calibrate_linear:
           method: least_squares
           datapoints:
-            - 0.33 -> -0
-            - 3.33 -> 12
+            - 0.18 -> 1.2
+            - 0.21  -> 1.5
+
+  - platform: dht
+    pin: D6
+    temperature:
+      id: "t_outside_ext"
+      name: "Boiler Outside temperature"
+    humidity:
+      id: "hum_outside"
+      name: "Boiler Outside humidity"
+    update_interval: 60s
 
   - platform: homeassistant
     id: ch_room_temperature
     entity_id: sensor.sensor_livingroom_temperature
     filters: 
       # Push room temperature every second to update PID parameters
-      - heartbeat: 1s 
+      - heartbeat: 1s
+
+  - platform: pid
+    name: "PID PROPORTIONAL"
+    type: PROPORTIONAL
+
+  - platform: pid
+    name: "PID INTEGRAL"
+    type: INTEGRAL
+
+  - platform: pid
+    name: "PID DERIVATIVE"
+    type: DERIVATIVE
 
 binary_sensor:
   - platform: opentherm
@@ -162,9 +216,9 @@ switch:
       mode: restore_default_on
     dhw_enable:
       name: "Boiler Domestic Hot Water enabled"
-    cooling_enable:
-      name: "Boiler Cooling enabled"
-      mode: start_off
+    # cooling_enable:
+    #   name: "Boiler Cooling enabled"
+    #   mode: start_off
     otc_active:
       name: "Boiler Outside temperature compensation active"
 
@@ -172,7 +226,10 @@ button:
   - platform: template
     name: "PID Climate Autotune"
     on_press:
-      - climate.pid.autotune: central_heating
+      - climate.pid.autotune: 
+          id: central_heating
+          positive_output: 25%
+          negative_output: 4%
 
 climate:
   - platform: pid
@@ -189,6 +246,6 @@ climate:
       kd_multiplier: 0.0   # derviative is turned off inside deadband
       deadband_output_averaging_samples: 15  
     control_parameters: 
-      kp: 0
-      ki: 0
-      kd: 0
+      kp: 0.33650
+      ki: 0.00005
+      kd: 1480.14661
